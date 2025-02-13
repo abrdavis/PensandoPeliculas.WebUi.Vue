@@ -1,0 +1,2 @@
+D:\projects\pensandoPeliculas\RavelDev.PensandoPeliculas.WebUi\obj\Debug\raveldev.pensandopeliculas.webui.esproj.CoreCompileInputs.cache
+C:\projects\PensadoPeliculas\RavelDev.PensandoPeliculas.WebUi\obj\Debug\raveldev.pensandopeliculas.webui.esproj.CoreCompileInputs.cache

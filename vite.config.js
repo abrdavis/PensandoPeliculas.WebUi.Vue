@@ -9,8 +9,10 @@ export default defineConfig({
     host: 'dev.local',
     port: 8080,
     https: {
-      key: fs.readFileSync('C:/certs/localhost/dev.local+4-key.pem'),
-      cert: fs.readFileSync('C:/certs/localhost/dev.local+4.pem'),
+      // eslint-disable-next-line no-undef
+      key:  process.env.NODE_ENV === 'development' ? fs.readFileSync('C:/certs/localhost/dev.local+4-key.pem') : '',
+      // eslint-disable-next-line no-undef
+      cert:  process.env.NODE_ENV === 'development'  ? fs.readFileSync('C:/certs/localhost/dev.local+4.pem') : '',
     }
   },
   plugins: [

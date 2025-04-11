@@ -11,7 +11,8 @@ function request(method) {
     return (url, body) => {
         const requestOptions = {
             method,
-            headers: authHeader(url)
+            headers: authHeader(url),
+            credentials: 'include'
         };
         if (body) {
             requestOptions.headers['Content-Type'] = 'application/json';

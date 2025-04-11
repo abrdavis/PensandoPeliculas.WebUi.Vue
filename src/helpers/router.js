@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
+import {getCookie} from './cookie-helper'
 import { useAuthStore } from '@/stores';
-import { HomeView, LoginView, InsertTitleView, InsertReviewView, ReviewView, AdminView } from '@/views';
+import { HomeView, LoginView, InsertTitleView, InsertReviewView, ReviewView, AdminView, MetaDataView, UpdateReviewView } from '@/views';
 
 
 
@@ -23,26 +23,39 @@ export const router = createRouter({
                     component: InsertReviewView
                 },
                 {
+                    path: 'review/:slug',
+                    component: UpdateReviewView
+                },
+                {
                     path: '', component: AdminView,
+                },
+                {
+                    path: 'metadata', component: MetaDataView
                 }
             ],
             meta: {
                 roleRequired: 'true',
-                roleType: 'admin'
+                roleType: 'admin',
+                authRequired: 'true'
               },
         },
-        { path: '/review/:id', component: ReviewView },
+        { path: '/review/:slug', component: ReviewView },
     ]
 });
 
 router.beforeEach(async (to) => {
-    // redirect to login page if not logged in and trying to access a restricted page
-    const authRequired = to.path.indexOf('admin') >= 0 ? true : false;
+
     const auth = useAuthStore();
+    const authCookie = getCookie('X-Token-Valid');
     if (to.meta.roleRequired){
         console.log(to.meta)
     }
-        if (authRequired && !auth.user) {
+
+    if(!authCookie){
+        auth.user = null;
+    }
+    if (to.meta.authRequired && !authCookie) {
+        
         auth.returnUrl = to.fullPath;
         return '/login';
     }

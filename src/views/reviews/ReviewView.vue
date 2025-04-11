@@ -1,53 +1,32 @@
-<!-- eslint-disable no-undef -->
 <script setup>
 
 
-import { ref } from 'vue'
-import AddTitleModal from '@/components/titles/AddTitleModal.vue';
+import {ref} from 'vue'
+import { useRoute } from 'vue-router';
+import { reviewService } from '@/services/reviewService';
+
 import 'feather-icons/dist/feather.min.js'
-const addTitleModal = ref(null);
-const titleAutocompleteResults = ref([]);
+const route = useRoute();
+const reviewSlug = route.params.slug;
+const reviewModel = ref(null)
+reviewService.getReviewForSlug(reviewSlug).then(res => {
+    if(res.data && res.data.success){
+        reviewModel.value = res.data.reviewModel;
+    }
+    else{
+        console.log(res)
+    }
+});
 
 
 </script>
 
 <template>
     <div>
-        <h3>Title Information</h3>
-        <div class="row">
-            <div class="col-3">
-                <label for="titleSelect" class="form-label">Select Title</label>
-                <inpu v-model="titleSearch" @keyup="filterTitles" id="titleSelect" class="form-control" type="text"/>
-                <ul v-if="titleAutocompleteResults.length">
-                    <li
-                        v-for="title in titleAutocompleteResults"
-                        :key="title.titleId"
-                    >
-                        {{ title.titleName }}
-                    </li>
-                </ul>
- 
-                <a href="#" @click="showAddTitleModal">Add New Title</a>
-            </div>
-            <div class="col-9">
-                <img id="titleImage" v-bind:src="titleImageUrl"/>
-            </div>
-
-        </div>
-        <div>
-            <h3>
-                Review
-            </h3>
-            <label for="reviewTitle" class="form-label">Title</label>
-            <input v-model="reviewTitle" id="reviewTitle" class="form-control" />
-
-            <label for="reviewText" class="form-label">Text</label>
-            <textarea v-model="reviewText" class="form-control"></textarea>
-
-            <label for="reviewScore" class="form-label">Rating</label>
-            <input type="number" v-model="reviewScore" class="form-control" />
-            <button @click="postReviewClick">Post Review</button>
-        </div>
+            <h3>{{reviewModel.reviewTitle}}</h3>
+            <p>
+                    {{reviewModel.reviewText}}
+            </p>
     </div>
-    <AddTitleModal @add-title-modal-callback="addTitleModalCallback" ref="addTitleModal"></AddTitleModal>
+    
 </template>

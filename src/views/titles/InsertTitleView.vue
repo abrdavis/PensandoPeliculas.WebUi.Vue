@@ -20,6 +20,6 @@ function insertTitleClick() {
         <input type="date" v-model="releaseDate" />
         <button @click="insertTitleClick">Insert Title</button>
     </div>
-
+<InsertTitleModal ref="insertTitleModal"/>
 
 </template>

@@ -1,15 +1,15 @@
 import { defineStore } from 'pinia';
-
+import { ref } from 'vue';
 import { fetchWrapper, router } from '@/helpers';
 import { ApiPaths } from "@/utility/apiroutes";
 
-export const useAuthStore = defineStore({
-    id: 'auth',
-    state: () => ({
-        // initialize state from local storage to enable user to stay logged in
-        user: JSON.parse(localStorage.getItem('user')),
-        returnUrl: null
-    }),
+export const useAuthStore = defineStore('auth', {
+    state: () => {
+        const user = ref(null)
+        return {
+            user
+        }
+      },
     actions: {
         async login(username, password) {
             const requestUrl = `${import.meta.env.VITE_API_URL}/${ApiPaths.Authenticate}`;
@@ -24,9 +24,9 @@ export const useAuthStore = defineStore({
             }
         },
         logout() {
-            this.user = null;
-            localStorage.removeItem('user');
+            this.$reset();
             router.push('/login');
         }
-    }
+    },
+    persist: true
 });

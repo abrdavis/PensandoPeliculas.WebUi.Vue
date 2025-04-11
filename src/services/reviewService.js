@@ -1,23 +1,30 @@
-import axios from "axios";
 import { ApiPaths } from "@/utility/apiroutes";
-import { authHeader } from "@/helpers/auth";
+import axiosWebApi from "./axios/interceptors";
+
 
 export const reviewService = {
     getReviews,
     postReview,
-    getRecentReviews
+    getHomePageReviews,
+    getReviewForSlug
 };
-
+function getReviewForSlug(reviewSlug){
+    return axiosWebApi.get(`${ApiPaths.ReviewGetForSlug}?reviewSlug=${reviewSlug}`)
+    .then(res => {
+        return res;
+    });
+}
 function getReviews() {
-    return axios.get(`${import.meta.env.API_URL}/${ApiPaths.GetReviews}`)
+    return axiosWebApi.get(ApiPaths.GetReviews)
         .then(res => {
             return res;
         });
 }
 
-function getRecentReviews(){
-    const url  = `${import.meta.env.VITE_API_URL}/${ApiPaths.RecentReviews}`;
-        return axios.get(url)        .then(res => {
+function getHomePageReviews(){
+    const url  = ApiPaths.GetHomePageReviews;
+        return axiosWebApi.get(url)        
+            .then(res => {
         return res;
     });
 }
@@ -25,21 +32,19 @@ function getRecentReviews(){
 function postReview(reviewTitleId, 
     reviewRating, 
     reviewPostTitle, 
-    reviewText) {
+    reviewText,
+    headerImage) {
     const requestData = {
         reviewTitleId: reviewTitleId,
         reviewRating: reviewRating,
         reviewTitle: reviewPostTitle,
         reviewText: reviewText,
-        reviewAuthor: '',
-        reviewDate: '',
-        isVisible: true 
+        isVisible: true,
+        headerImage: headerImage
 
     }
-
-    let headers = authHeader();
-    headers['content-type'] = 'multipart/form-data';
-    return axios.post(`${import.meta.env.VITE_API_URL}/${ApiPaths.PostReview}`, requestData, {headers: headers} )
+    let headers = {'content-type': 'multipart/form-data'};
+    return axiosWebApi.post(ApiPaths.PostReview, requestData, {headers: headers, withCredentials: true} )
     .then(res => {
         return res;
     });

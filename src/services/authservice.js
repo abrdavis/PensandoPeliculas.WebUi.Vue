@@ -7,13 +7,11 @@ export const authenticationService = {
 };
 
 function login(username, password) {
-    return axios.post(`${import.meta.env.API_URL}/${ApiPaths.Authenticate}`, 
+    return axios.post(`${import.meta.env.VITE_API_URL}/${ApiPaths.Authenticate}`, 
         { username: username, password: password })
         .then(handleResponse)
         .then(user => {
-            // login successful if there's a jwt token in the response
             if (user.token) {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
             }
 
@@ -21,9 +19,13 @@ function login(username, password) {
         });
 }
 
-function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('user');
+async function  logout() {
+    let url = `${import.meta.env.VITE_API_URL}/${ApiPaths.Logout}`
+    await axios.get(url).then(res=>{
+        console.log(res);
+
+        }
+    )
 }
 
 function handleResponse(response) {
@@ -31,10 +33,8 @@ function handleResponse(response) {
         const data = response.data.user;
         if (!response.ok) {
             if (response.status === 401) {
-                // auto logout if 401 response returned from api
                 logout();
                 location.reload(true);
-
             }
         }
         else {

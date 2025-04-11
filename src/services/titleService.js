@@ -1,6 +1,5 @@
-import axios from "axios";
 import { ApiPaths } from "@/utility/apiroutes";
-import { authHeader } from "@/helpers/auth";
+import axiosWebApi from "./axios/interceptors";
 
 export const titleService = {
     getTitlesFilterByName,
@@ -8,23 +7,24 @@ export const titleService = {
 };
 
 function getTitlesFilterByName(filterText) {
-    return axios.get(`${import.meta.env.VITE_API_URL}/${ApiPaths.GetTitlesFilterByName}?filterText=${filterText}`)
+    return axiosWebApi.get(`${ApiPaths.GetTitlesFilterByName}?filterText=${filterText}`)
         .then(res => {
             return res;
         });
 }
 
-function insertTitle(titleName, releaseDate, titleImage) {
+function insertTitle(titleName, releaseDate, titleImage, genre, durationMinutes) {
     const requestData = {
         titleName: titleName,
         releaseDate: releaseDate,
-        titleImage: titleImage
+        titleImage: titleImage,
+        genre : genre,
+        durationMinutes : durationMinutes
     }
-    const url = `${import.meta.env.VITE_API_URL}/${ApiPaths.InsertTitle}`
-    let headers = authHeader();
-    headers['content-type'] = 'multipart/form-data';
-    return axios.post(url, requestData, {headers: headers} )
+    const url = ApiPaths.InsertTitle;
+    let headers = {'content-type': 'multipart/form-data'};
+    return axiosWebApi.post(url, requestData, {headers: headers, withCredentials: true} )
     .then(res => {
-        return res;
+         return res;
     });
 }

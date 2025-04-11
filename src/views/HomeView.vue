@@ -1,15 +1,17 @@
 <script setup>
 
     import { reviewService } from '@/services/reviewService';
- 
+    import { ref } from 'vue'
 
   
 
-    let recentReviews = [];
-    reviewService.getRecentReviews().then(res =>{
+    const recentReviews = ref([]);
+    const recentReleaseReviews = ref([]);
+    reviewService.getHomePageReviews().then(res =>{
         const data = res.data;
             if(data.success){
-                recentReviews = data.recentReviews;
+                recentReviews.value = data.pageModel.recentReviews;
+                recentReleaseReviews.value = data.pageModel.recentReleasedReviews;
             }
         }
     );
@@ -25,15 +27,29 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row review-home-section">
         <div class="col-12">
-            <h3>Recent Reviews</h3>
-            <ul v-if="recentReviews?.length">
-            <li v-for="review in recentViews" :key="review.reviewId"></li>
-        </ul>
+            <h3 class="review-section-header">Recent Reviews</h3>
+           <ReviewThumbnails :reviews="recentReviews"/>
+        </div>
+    </div>
+    <div class="row review-home-section">
+        <div class="col-12">
+            <h3 class="review-section-header">Recently Released</h3>
+           <ReviewThumbnails :reviews="recentReleaseReviews"/>
         </div>
     </div>
     <div>
 
     </div>
 </template>
+
+
+<style>
+.review-home-section{
+    min-height: 400px !important;
+    margin-bottom:2em;
+}
+
+
+</style>

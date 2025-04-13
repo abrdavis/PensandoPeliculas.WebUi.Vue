@@ -6,7 +6,7 @@ import { HomeView, LoginView, InsertTitleView, InsertReviewView, ReviewView, Adm
 
 
 export const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     linkActiveClass: 'active',
     routes: [
         { path: '/', component: HomeView },

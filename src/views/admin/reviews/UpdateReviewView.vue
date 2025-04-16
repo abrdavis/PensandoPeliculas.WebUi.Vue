@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onBeforeMount} from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router';
 import { reviewService } from '@/services/reviewService';
 
@@ -7,26 +7,29 @@ import 'feather-icons/dist/feather.min.js'
 const route = useRoute();
 const reviewSlug = route.params.slug;
 
-const reviewModel = ref(null)
+const reviewModel = ref(null);
 
+async function onUpdateReview(titleForReview, reviewScore, reviewTitle, reviewText, reviewHeaderImg){
+    return await reviewService.postReview(titleForReview, reviewScore, reviewTitle, reviewText, reviewHeaderImg);
+}
 
-onBeforeMount(() => {
-    reviewService.getReviewForSlug(reviewSlug).then(res => {
-    if(res.data && res.data.success){
+onBeforeMount(async () => {
+    let res = await reviewService.getReviewForSlug(reviewSlug)
+    if (res.data && res.data.success) {
         reviewModel.value = res.data.reviewModel;
     }
-    else{
+    else {
         console.log(res)
     }
-});
+}
+)
 
-})
 </script>
 
 <template>
     <div>
         <h3>Add New Review</h3>
-        <ReviewAdmin :review="reviewModel" />
+        <ReviewAdmin :review="reviewModel"  @on-form-submit="onUpdateReview"/>
 
     </div>
 

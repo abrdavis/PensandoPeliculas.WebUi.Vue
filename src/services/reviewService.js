@@ -8,7 +8,7 @@ export const reviewService = {
     getHomePageReviews,
     getReviewForSlug
 };
-function getReviewForSlug(reviewSlug){
+async function getReviewForSlug(reviewSlug){
     return axiosWebApi.get(`${ApiPaths.ReviewGetForSlug}?reviewSlug=${reviewSlug}`)
     .then(res => {
         return res;

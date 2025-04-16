@@ -19,7 +19,8 @@
       return {
         filteredOptions: [],
         showDropdown: false,
-        selectedOption: null
+        selectedOption: null,
+        displayValue: ''
       };
     },
     props: {

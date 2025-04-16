@@ -1,189 +1,202 @@
-
-
-<script>
-
-export default {
-  name: 'ReviewAdmin',
-  props: {
-    review: {
-      type: Object,
-      default: () => ({}),
-    },
-  }
-}
-</script>
-
 <script setup>
-import { router } from '@/helpers'
-import { titleService } from '@/services/titleService';
-import { reviewService } from '@/services/reviewService';
-import { ref   } from 'vue'
-import { Form, Field } from 'vee-validate';
+// import { router } from '@/helpers'
+// import { titleService } from '@/services/titleService';
+
+import { ref } from 'vue'
+import { useForm } from 'vee-validate';
 import * as Yup from 'yup';
 import { Spinner } from 'spin.js';
 import 'feather-icons/dist/feather.min.js'
+import { titleService } from '@/services/titleService';
+import { toast } from 'vue3-toastify';
 
-
-
-let spinner = null;
-let reviewHeaderImg = null;
-const spinnerContainer = ref(null)
-const insertTitleModal = ref(null);
-const showDropdown = ref(false);
-const titleImageUrl = ref('')
-const titleForReview = ref(0)
-const titleAutocompleteResults = ref([]);
-const titleSearch = ref('')
-const nonEmptyString = (value) =>  value.trim().length !== 0
-
-function startSpin() {
-    const config = {
-        lines: 12,
-        length: 7,
-        width: 5,
-        radius: 10,
-        color: '#000',
-        speed: 1,
-        trail: 60,
-        fps: 20,
-    };
-    spinner = new Spinner(config).spin(spinnerContainer.value);
-}
-function stopSpin() {
-    if (spinner) {
-        spinner.stop();
-        spinner = null;
-    }
-}
-
-
-function onSubmit(values, { setErrors }) {
-
-    const { reviewScore, reviewTitle, reviewText } = values;
-    startSpin();
-    return reviewService.postReview(titleForReview.value, reviewScore, reviewTitle, reviewText, reviewHeaderImg).then(res => {
-        stopSpin();
-        const data = res.data;
-        if (data && data.success) {
-            router.push({ path: `/review/${data.reviewId}` });
-        }
-        else {
-            console.log('Error saving review');
-        }
-    }).catch(error => setErrors({ apiError: error }));
-
-}
-const formValidationSchema = Yup.object().shape({
-    reviewScore: Yup.number().min(0, "A movie can't really be worse than a 0.").max(10.0, "A score of ten is about as perfect as it gets.").required("You gotta let the people know what you think.")
-    .test('decimal-range', 'Only one digit in the decimal place, please.', value => (value+"").match(/^\d*\.?\d{1}$/)),
-    reviewText: Yup.string().required('Consider actually leaving a review').test('emptyString', 'Input is empty', nonEmptyString),
-    reviewTitle: Yup.string().required('A good title goes a long way').test('emptyString', 'Input is empty', nonEmptyString),
-    titleForReview: Yup.number().required().min(1, "Selecting a title is always a great idea.")
+defineOptions({
+  name: 'ReviewAdmin',
 });
 
- function resetSelectedTitle(){
-     titleImageUrl.value = ''
-     titleForReview.value = 0;
- }
- function filterTitles(event) {
-     if (event.keyCode === 8 || event.keyCode === 46) {
-         resetSelectedTitle();
-     }
-     titleService.getTitlesFilterByName(titleSearch.value).then(res => {
-         const data = res.data;
-         if (data && data.success) {
-             titleAutocompleteResults.value = data.titles;
-         }
-     })
- }
- const selectTitle = (title) => {
-     titleForReview.value = title.titleId
-     titleSearch.value = title.titleName
-     titleImageUrl.value = title.posterUrl;
-     titleAutocompleteResults.value = []
- }
-
-
- function onHeaderImageSelect(e) {
-     var files = e.target.files || e.dataTransfer.files;
-     if (!files.length)
-         return;
-         reviewHeaderImg = files[0];
- }
-
-
- async function titleAutoCompleteBlur() {    
-     setTimeout(() => {
-               showDropdown.value = false;
-           }, 200);
-
- }   
-
- function showAddTitleModal() {
-    insertTitleModal.value.showModal()
+const emit = defineEmits(['onFormSubmit'])
+const props = defineProps({
+  review: {
+    type: Object
+  }
+});
+let spinner = null;
+const spinnerContainer = ref(null)
+function showAddTitleModal() {
+  insertTitleModal.value.showModal()
 }
-function insertTitleModalCallback(data){
-    titleImageUrl.value = data.title.posterUrl;
-   titleForReview.value = data.title.titleId;
-    titleSearch.value = data.title.titleName;
 
- }
+function resetSelectedTitle() {
+  titleImageUrl.value = ''
+  titleForReview.value = 0;
+}
+
+function filterTitles(event) {
+  if (event.keyCode === 8 || event.keyCode === 46) {
+    resetSelectedTitle();
+  }
+  titleService.getTitlesFilterByName(titleName.value).then(res => {
+    const data = res.data;
+    if (data && data.success) {
+      titleAutocompleteResults.value = data.titles;
+    }
+  })
+}
+
+function startSpin() {
+  const config = {
+    lines: 12,
+    length: 7,
+    width: 5,
+    radius: 10,
+    color: '#000',
+    speed: 1,
+    trail: 60,
+    fps: 20,
+  };
+  spinner = new Spinner(config).spin(spinnerContainer.value);
+}
+
+function stopSpin() {
+  if (spinner) {
+    spinner.stop();
+
+    spinner = null;
+  }
+}
+
+
+async function titleAutoCompleteBlur() {
+  setTimeout(() => {
+    showDropdown.value = false;
+  }, 200);
+}
+
+const selectTitle = (title) => {
+  titleForReview.value = title.titleId
+  titleName.value = title.titleName
+  titleImageUrl.value = title.posterUrl;
+  titleAutocompleteResults.value = []
+}
+const reviewHeaderImg = ref(null);
+const insertTitleModal = ref(null);
+const titleAutocompleteResults = ref([]);
+const titleModel = ref(null);
+const titleImageUrl = ref(props.review?.posterUrl);
+const showDropdown = ref(false);
+
+
+function insertTitleModalCallback(data) {
+  console.log('callback called!');
+  titleImageUrl.value = `${import.meta.env.VITE_BASE_URL}${data.posterImageUrl}`;
+  titleModel.value = data.title;
+
+}
+const nonEmptyString = (value) => value.trim().length !== 0;
+const formValidationSchema = Yup.object().shape({
+  reviewRating: Yup.number().min(0, "A movie can't really be worse than a 0.").max(10.0, "A score of ten is about as perfect as it gets.").required("You gotta let the people know what you think.")
+    .test('decimal-range', 'Only one digit in the decimal place, please.', value => (value + "").match(/^\d*\.?\d{1}$/)),
+  reviewText: Yup.string().required('Consider actually leaving a review').test('emptyString', 'Input is empty', nonEmptyString),
+  reviewTitle: Yup.string().required('A good title goes a long way').test('emptyString', 'Input is empty', nonEmptyString),
+  titleForReview: Yup.number().required().min(1, "Selecting a title is always a great idea.")
+});
+
+const { errors, handleSubmit, defineField } = useForm({
+  validationSchema: formValidationSchema,
+  initialValues: {
+    reviewText: props.review?.reviewText,
+    reviewTitle: props.review?.reviewTitle,
+    reviewRating: props.review?.reviewRating,
+    titleForReview: props.review?.reviewTitleId,
+    titleName: props.review?.titleName
+  },
+});
+
+const onSubmit = handleSubmit(values => {
+  const { reviewScore, reviewTitle, reviewText } = values;
+  startSpin();
+  const result = emit('onFormSubmit', titleForReview.value, reviewScore, reviewTitle, reviewText, reviewHeaderImg)
+
+  if(result.success){
+    toast("Genre added.", {
+        "theme": "dark",
+        "type": "success",
+        "dangerouslyHTMLString": true
+      });
+  }
+  else{
+    toast("Genre added.", {
+        "theme": "dark",
+        "type": "success",
+        "dangerouslyHTMLString": true
+      });
+  }
+
+  stopSpin();
+
+});
+
+const [reviewText, reviewTextAttrs] = defineField('reviewText');
+const [reviewTitle, reviewTitleAttrs] = defineField('reviewTitle');
+const [reviewRating, reviewRatingAttrs] = defineField('reviewRating');
+const [titleForReview, titleForReviewAttrs] = defineField('titleForReview');
+const [titleName, titleNameAttrs] = defineField('titleName');
+
 </script>
 
 <template>
-                 <Form @submit="onSubmit" :validation-schema="formValidationSchema" v-slot="{ errors, isSubmitting }"> 
-        <div class="row mb-3">
-            <div class="col-3">
-                <label for="titleSelect" class="form-label">Title to Review</label>
-                <Field name="titleForReview" type="hidden" :class="{ 'is-invalid': errors.titleForReviewText }"/>
-                <input v-model="titleSearch" name="titleForReviewText" @keyup="filterTitles" @blur="titleAutoCompleteBlur" @focus="showDropdown = true" id="titleSelect" 
-                    class="form-control auto-complete-input"   :class="{ 'is-invalid': errors.titleForReview }" type="text" />
-                    <div class="invalid-feedback">{{errors.titleForReview}}</div>
-                <ul v-if="titleAutocompleteResults.length && showDropdown" class="auto-complete-list">
-                    <li class="auto-complete-list-item" v-for="title in titleAutocompleteResults"
-                        @click="selectTitle(title)" :key="title.titleId">
-                        {{ title.titleName }}
-                    </li>
-                </ul>
-                <a href="#" @click="showAddTitleModal">Add New Title</a>
-            </div>
-            <div class="col-9">
-                <img id="titleImage" class="poster-image" />
-            </div> 
-            <h3>
-                Review
-            </h3>
+  <form @submit="onSubmit" id="reviewForm">
+    <div class="row mb-3">
+      <div class="col-2">
+        <img id="titleImage" v-bind:src="titleImageUrl" class="poster-image" />
+      </div>
+      <div class="col-10">
+        <label for="titleSelect" class="form-label">Title to Review</label>
+        <input name="titleForReview" type="hidden" v-model="titleForReview" v-bind="titleForReviewAttrs" />
+        <input name="titleSelect" @keyup="filterTitles" @blur="titleAutoCompleteBlur" @focus="showDropdown = true"
+          id="titleSelect" class="form-control auto-complete-input" type="text" v-model="titleName"
+          v-bind="titleNameAttrs" />
 
-                <div class="form-group">
-                    <label for="reviewTitle" class="form-label">Review Title</label>
-                    <Field name="reviewTitle" id="reviewTitle" class="form-control mb-2"   :class="{ 'is-invalid': errors.reviewTitle }" />
-                    <div class="invalid-feedback">{{errors.reviewTitle}}</div>
-                </div>
-                <div class="form-group">
-                    <label for="reviewHeaderImg" class="form-label">Review Header</label>
-                    <input class="form-control form-control-lg" id="reviewHeaderImg" type="file" @change="onHeaderImageSelect">
-                </div>
-                <div class="form-group">
-                    <label for="reviewText" class="form-label">Review Text</label>
-                    <Field as="textarea"  name="reviewText" class="form-control mb-2" :class="{ 'is-invalid': errors.reviewText }" />
-                    <div class="invalid-feedback">{{errors.reviewText}}</div>
-                </div>
-                <div class="form-group">
-                    <label for="reviewScore" class="form-label">Rating</label>
-                    <Field type="number" name="reviewScore" class="form-control" id="reviewScore" min="0"
-                        max="10"  :class="{ 'is-invalid': errors.reviewScore }" />
-                    <div class="invalid-feedback">{{errors.reviewScore}}</div>
-                </div>
-                <div class="form-group mt-3">
-                    <button class="btn btn-primary" :disabled="isSubmitting">
-                        <span v-show="isSubmitting" class="spinner-border spinner-border-sm mr-1"></span>
-                        Post Review
-                    </button>
-                </div> 
-                <div v-if="errors.apiError" class="alert alert-danger mt-3 mb-0">{{errors.apiError}}</div>
-            </div>
-            </Form>
-            <InsertTitleModal @insert-title-modal-callback="insertTitleModalCallback" ref="insertTitleModal" />
+        <ul v-if="titleAutocompleteResults.length && showDropdown" class="auto-complete-list">
+          <li class="auto-complete-list-item" v-for="title in titleAutocompleteResults" @click="selectTitle(title)"
+            :key="title.titleId">
+            {{ title.titleName }}
+          </li>
+        </ul>
+        <a href="#" @click="showAddTitleModal">Add New Title</a>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group">
+          <label for="reviewTitle" class="form-label">Review Title</label>
+          <input type="text" class="w-100" :class="{ 'is-invalid': errors.reviewTitle }" name="reviewTitle"
+            id="reviewTitle" v-model="reviewTitle" v-bind="reviewTitleAttrs" />
+          <div class="invalid-feedback">{{ errors.reviewTitle }}</div>
+        </div>
+        <div class="form-group">
+          <label for="reviewHeaderImg" class="form-label">Review Header</label>
+          <input class="form-control form-control-lg w-100" id="reviewHeaderImg" name="reviewHeaderImg" type="file">
+        </div>
+        <div class="form-group">
+          <label for="reviewText" class="form-label">Review Text</label>
+          <textarea class="w-100" name="reviewText" id="reviewText" v-model="reviewText"
+            v-bind="reviewTextAttrs"  :class="{ 'is-invalid': errors.reviewText }" ></textarea>
+            <div class="invalid-feedback">{{ errors.reviewText }}</div>
+        </div>
+        <div class="form-group">
+          <label for="reviewRating" class="form-label">Rating</label>
+          <input name="reviewRating" id="reviewRating" type="number" v-model="reviewRating"
+            v-bind="reviewRatingAttrs" min="0" max="10"
+                        :class="{ 'is-invalid': errors.reviewRating }" />
+                    <div class="invalid-feedback">{{ errors.reviewRating }}</div>
+
+        </div>
+        <button>Submit</button>
+      </div>
+    </div>
+  </form>
+  <InsertTitleModal @insert-title-modal-callback="insertTitleModalCallback" ref="insertTitleModal" />
 </template>
 
 <style scoped>
@@ -192,10 +205,14 @@ function insertTitleModalCallback(data){
 .review-poster-home {
   width: 200px;
   margin-right: 2em;
-  margin-bottom:10px;
+  margin-bottom: 10px;
 }
 
-.thumbnail{
+.thumbnail {
   max-width: 200px;
+}
+
+label {
+  font-weight: bold;
 }
 </style>

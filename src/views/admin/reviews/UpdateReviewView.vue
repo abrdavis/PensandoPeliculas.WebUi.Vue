@@ -2,16 +2,12 @@
 import { ref, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router';
 import { reviewService } from '@/services/reviewService';
-
+import { ReviewConstants } from '@/utility/constants/reviewconstants';
 import 'feather-icons/dist/feather.min.js'
 const route = useRoute();
 const reviewSlug = route.params.slug;
 
 const reviewModel = ref(null);
-
-async function onUpdateReview(titleForReview, reviewScore, reviewTitle, reviewText, reviewHeaderImg){
-    return await reviewService.postReview(titleForReview, reviewScore, reviewTitle, reviewText, reviewHeaderImg);
-}
 
 onBeforeMount(async () => {
     let res = await reviewService.getReviewForSlug(reviewSlug)
@@ -21,18 +17,15 @@ onBeforeMount(async () => {
     else {
         console.log(res)
     }
-}
-)
+})
 
 </script>
 
 <template>
     <div>
         <h3>Add New Review</h3>
-        <ReviewAdmin :review="reviewModel"  @on-form-submit="onUpdateReview"/>
-
+        <ReviewAdmin :review="reviewModel"  :mode="ReviewConstants.Update"/>
     </div>
-
 </template>
 <style>
 .poster-image {

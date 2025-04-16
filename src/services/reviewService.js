@@ -4,7 +4,8 @@ import axiosWebApi from "./axios/interceptors";
 
 export const reviewService = {
     getReviews,
-    postReview,
+    insertReview,
+    updateReview,
     getHomePageReviews,
     getReviewForSlug
 };
@@ -28,8 +29,27 @@ function getHomePageReviews(){
         return res;
     });
 }
+ function updateReview(reviewId,
+    reviewTitleId, 
+    reviewRating, 
+    reviewPostTitle, 
+    reviewText,
+    headerImage
+){
+    const requestData = {
+        reviewId : reviewId,
+        reviewTitleId: reviewTitleId,
+        reviewRating: reviewRating,
+        reviewTitle: reviewPostTitle,
+        reviewText: reviewText,
+        isVisible: true,
+        headerImage: headerImage
 
-function postReview(reviewTitleId, 
+    }
+    let headers = {'content-type': 'multipart/form-data'};
+    return axiosWebApi.post(ApiPaths.ReviewUpdate, requestData, {headers: headers, withCredentials: true} ).then(res => {return res;});
+}
+async function insertReview(reviewTitleId, 
     reviewRating, 
     reviewPostTitle, 
     reviewText,
@@ -44,9 +64,6 @@ function postReview(reviewTitleId,
 
     }
     let headers = {'content-type': 'multipart/form-data'};
-    return axiosWebApi.post(ApiPaths.PostReview, requestData, {headers: headers, withCredentials: true} )
-    .then(res => {
-        return res;
-    });
+    return axiosWebApi.post(ApiPaths.ReviewInsert, requestData, {headers: headers, withCredentials: true} )
 }
        

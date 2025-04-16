@@ -19,10 +19,6 @@ export const router = createRouter({
                     component: InsertReviewView
                 },
                 {
-                    path: 'review/manage',
-                    component: InsertReviewView
-                },
-                {
                     path: 'review/:slug',
                     component: UpdateReviewView
                 },

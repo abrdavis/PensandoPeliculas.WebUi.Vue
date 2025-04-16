@@ -1,7 +1,6 @@
 <script setup>
-// import { router } from '@/helpers'
-// import { titleService } from '@/services/titleService';
-
+ import { router } from '@/helpers'
+import { ReviewConstants } from '@/utility/constants/reviewconstants';
 import { ref } from 'vue'
 import { useForm } from 'vee-validate';
 import * as Yup from 'yup';
@@ -9,17 +8,22 @@ import { Spinner } from 'spin.js';
 import 'feather-icons/dist/feather.min.js'
 import { titleService } from '@/services/titleService';
 import { toast } from 'vue3-toastify';
+import { reviewService } from '@/services/reviewService';
 
 defineOptions({
   name: 'ReviewAdmin',
 });
 
-const emit = defineEmits(['onFormSubmit'])
+
 const props = defineProps({
   review: {
     type: Object
-  }
+  },
+  mode: {
+    type: String
+  },
 });
+
 let spinner = null;
 const spinnerContainer = ref(null)
 function showAddTitleModal() {
@@ -60,11 +64,9 @@ function startSpin() {
 function stopSpin() {
   if (spinner) {
     spinner.stop();
-
     spinner = null;
   }
 }
-
 
 async function titleAutoCompleteBlur() {
   setTimeout(() => {
@@ -78,6 +80,14 @@ const selectTitle = (title) => {
   titleImageUrl.value = title.posterUrl;
   titleAutocompleteResults.value = []
 }
+
+function insertTitleModalCallback(data) {
+  console.log('callback called!');
+  titleImageUrl.value = `${import.meta.env.VITE_BASE_URL}${data.posterImageUrl}`;
+  titleModel.value = data.title;
+
+}
+
 const reviewHeaderImg = ref(null);
 const insertTitleModal = ref(null);
 const titleAutocompleteResults = ref([]);
@@ -86,12 +96,7 @@ const titleImageUrl = ref(props.review?.posterUrl);
 const showDropdown = ref(false);
 
 
-function insertTitleModalCallback(data) {
-  console.log('callback called!');
-  titleImageUrl.value = `${import.meta.env.VITE_BASE_URL}${data.posterImageUrl}`;
-  titleModel.value = data.title;
 
-}
 const nonEmptyString = (value) => value.trim().length !== 0;
 const formValidationSchema = Yup.object().shape({
   reviewRating: Yup.number().min(0, "A movie can't really be worse than a 0.").max(10.0, "A score of ten is about as perfect as it gets.").required("You gotta let the people know what you think.")
@@ -112,24 +117,43 @@ const { errors, handleSubmit, defineField } = useForm({
   },
 });
 
-const onSubmit = handleSubmit(values => {
-  const { reviewScore, reviewTitle, reviewText } = values;
-  startSpin();
-  const result = emit('onFormSubmit', titleForReview.value, reviewScore, reviewTitle, reviewText, reviewHeaderImg)
 
-  if(result.success){
-    toast("Genre added.", {
-        "theme": "dark",
-        "type": "success",
-        "dangerouslyHTMLString": true
-      });
+const onSubmit = handleSubmit(values => {
+  const { reviewRating, reviewTitle, reviewText } = values;
+
+  startSpin();
+
+  if (props.mode == ReviewConstants.Update) {
+    reviewService.updateReview(props.review.reviewId, titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg).then(res => {
+      if (res.data && res.data.success) {
+        toast("Review updated.", {
+          "theme": "dark",
+          "type": "success",
+          "dangerouslyHTMLString": true
+        });
+      }
+      else {
+        toast("Error updating review.", {
+          "theme": "dark",
+          "type": "success",
+          "dangerouslyHTMLString": true
+        });
+      }
+    });
   }
-  else{
-    toast("Genre added.", {
-        "theme": "dark",
-        "type": "success",
-        "dangerouslyHTMLString": true
-      });
+  else if (props.mode == ReviewConstants.Insert) {
+    reviewService.insertReview(titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg).then(res => {
+      if (res.data && res.data.success) {
+            router.push({ path: `/review/${res.data.reviewId}` });
+      }
+      else {
+        toast("Error inserting review.", {
+          "theme": "dark",
+          "type": "success",
+          "dangerouslyHTMLString": true
+        });
+      }
+    });
   }
 
   stopSpin();
@@ -156,7 +180,6 @@ const [titleName, titleNameAttrs] = defineField('titleName');
         <input name="titleSelect" @keyup="filterTitles" @blur="titleAutoCompleteBlur" @focus="showDropdown = true"
           id="titleSelect" class="form-control auto-complete-input" type="text" v-model="titleName"
           v-bind="titleNameAttrs" />
-
         <ul v-if="titleAutocompleteResults.length && showDropdown" class="auto-complete-list">
           <li class="auto-complete-list-item" v-for="title in titleAutocompleteResults" @click="selectTitle(title)"
             :key="title.titleId">
@@ -180,16 +203,15 @@ const [titleName, titleNameAttrs] = defineField('titleName');
         </div>
         <div class="form-group">
           <label for="reviewText" class="form-label">Review Text</label>
-          <textarea class="w-100" name="reviewText" id="reviewText" v-model="reviewText"
-            v-bind="reviewTextAttrs"  :class="{ 'is-invalid': errors.reviewText }" ></textarea>
-            <div class="invalid-feedback">{{ errors.reviewText }}</div>
+          <textarea class="w-100" name="reviewText" id="reviewText" v-model="reviewText" v-bind="reviewTextAttrs"
+            :class="{ 'is-invalid': errors.reviewText }"></textarea>
+          <div class="invalid-feedback">{{ errors.reviewText }}</div>
         </div>
         <div class="form-group">
           <label for="reviewRating" class="form-label">Rating</label>
-          <input name="reviewRating" id="reviewRating" type="number" v-model="reviewRating"
-            v-bind="reviewRatingAttrs" min="0" max="10"
-                        :class="{ 'is-invalid': errors.reviewRating }" />
-                    <div class="invalid-feedback">{{ errors.reviewRating }}</div>
+          <input name="reviewRating" id="reviewRating" type="number" v-model="reviewRating" v-bind="reviewRatingAttrs"
+            min="0" max="10" :class="{ 'is-invalid': errors.reviewRating }" />
+          <div class="invalid-feedback">{{ errors.reviewRating }}</div>
 
         </div>
         <button>Submit</button>

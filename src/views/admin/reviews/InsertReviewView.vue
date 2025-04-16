@@ -9,7 +9,7 @@ import { Spinner } from 'spin.js';
 import 'feather-icons/dist/feather.min.js'
 
 let spinner = null;
-const reviewHeaderImg = ref(nill);
+const reviewHeaderImg = ref(null);
 const spinnerContainer = ref(null)
 const insertTitleModal = ref(null);
 const showDropdown = ref(false);

@@ -20,22 +20,15 @@
 </script>
 
 <template>
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                Pensado Peliculas
-            </div>
-        </div>
-    </div>
     <div class="row review-home-section">
         <div class="col-12">
-            <h3 class="review-section-header">Recent Reviews</h3>
+            <h3 class="review-section-header text-center mb-5">Recent Reviews</h3>
            <ReviewThumbnails :reviews="recentReviews"/>
         </div>
     </div>
     <div class="row review-home-section">
         <div class="col-12">
-            <h3 class="review-section-header">Recently Released</h3>
+            <h3 class="review-section-header text-center mb-5">Recently Released</h3>
            <ReviewThumbnails :reviews="recentReleaseReviews"/>
         </div>
     </div>

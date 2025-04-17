@@ -23,9 +23,9 @@ reviewService.getReviewForSlug(reviewSlug).then(res => {
 
 <template>
     <div>
-            <h3>{{reviewModel.reviewTitle}}</h3>
+            <h3>{{reviewModel?.reviewTitle}}</h3>
             <p>
-                    {{reviewModel.reviewText}}
+                    {{reviewModel?.reviewText}}
             </p>
     </div>
     

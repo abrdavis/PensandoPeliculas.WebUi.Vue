@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router';
 import { reviewService } from '@/services/reviewService';
 import { ReviewConstants } from '@/utility/constants/reviewconstants';
@@ -9,7 +9,7 @@ const reviewSlug = route.params.slug;
 
 const reviewModel = ref(null);
 
-onBeforeMount(async () => {
+onMounted(async () => {
     let res = await reviewService.getReviewForSlug(reviewSlug)
     if (res.data && res.data.success) {
         reviewModel.value = res.data.reviewModel;

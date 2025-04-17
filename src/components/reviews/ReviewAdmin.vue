@@ -1,5 +1,5 @@
 <script setup>
- import { router } from '@/helpers'
+import { router } from '@/helpers'
 import { ReviewConstants } from '@/utility/constants/reviewconstants';
 import { ref } from 'vue'
 import { useForm } from 'vee-validate';
@@ -17,13 +17,13 @@ defineOptions({
 
 const props = defineProps({
   review: {
-    type: Object
+    type: Object,
   },
   mode: {
-    type: String
+    type: String,
   },
 });
-
+console.log(props.review)
 let spinner = null;
 const spinnerContainer = ref(null)
 function showAddTitleModal() {
@@ -45,6 +45,15 @@ function filterTitles(event) {
       titleAutocompleteResults.value = data.titles;
     }
   })
+}
+
+function onHeaderImageSelect(e) {
+  var files = e.target.files || e.dataTransfer.files;
+  if (!files.length)
+    return;
+  reviewHeaderImg.value = files[0];
+
+  headerImgPreview.value = URL.createObjectURL(files[0])
 }
 
 function startSpin() {
@@ -88,6 +97,7 @@ function insertTitleModalCallback(data) {
 
 }
 
+const headerImgPreview = ref(null)
 const reviewHeaderImg = ref(null);
 const insertTitleModal = ref(null);
 const titleAutocompleteResults = ref([]);
@@ -124,7 +134,7 @@ const onSubmit = handleSubmit(values => {
   startSpin();
 
   if (props.mode == ReviewConstants.Update) {
-    reviewService.updateReview(props.review.reviewId, titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg).then(res => {
+    reviewService.updateReview(props.review.reviewId, titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg.value).then(res => {
       if (res.data && res.data.success) {
         toast("Review updated.", {
           "theme": "dark",
@@ -142,9 +152,9 @@ const onSubmit = handleSubmit(values => {
     });
   }
   else if (props.mode == ReviewConstants.Insert) {
-    reviewService.insertReview(titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg).then(res => {
+    reviewService.insertReview(titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg.value).then(res => {
       if (res.data && res.data.success) {
-            router.push({ path: `/review/${res.data.reviewId}` });
+        router.push({ path: `/review/${res.data.reviewId}` });
       }
       else {
         toast("Error inserting review.", {
@@ -171,10 +181,10 @@ const [titleName, titleNameAttrs] = defineField('titleName');
 <template>
   <form @submit="onSubmit" id="reviewForm">
     <div class="row mb-3">
-      <div class="col-2">
+      <div class="col-xl-3 col-5">
         <img id="titleImage" v-bind:src="titleImageUrl" class="poster-image" />
       </div>
-      <div class="col-10">
+      <div class="col-xl-9 col-7">
         <label for="titleSelect" class="form-label">Title to Review</label>
         <input name="titleForReview" type="hidden" v-model="titleForReview" v-bind="titleForReviewAttrs" />
         <input name="titleSelect" @keyup="filterTitles" @blur="titleAutoCompleteBlur" @focus="showDropdown = true"
@@ -189,7 +199,7 @@ const [titleName, titleNameAttrs] = defineField('titleName');
         <a href="#" @click="showAddTitleModal">Add New Title</a>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-12">
         <div class="form-group">
           <label for="reviewTitle" class="form-label">Review Title</label>
@@ -197,30 +207,37 @@ const [titleName, titleNameAttrs] = defineField('titleName');
             id="reviewTitle" v-model="reviewTitle" v-bind="reviewTitleAttrs" />
           <div class="invalid-feedback">{{ errors.reviewTitle }}</div>
         </div>
-        <div class="form-group">
-          <label for="reviewHeaderImg" class="form-label">Review Header</label>
-          <input class="form-control form-control-lg w-100" id="reviewHeaderImg" name="reviewHeaderImg" type="file">
-        </div>
-        <div class="form-group">
-          <label for="reviewText" class="form-label">Review Text</label>
-          <textarea class="w-100" name="reviewText" id="reviewText" v-model="reviewText" v-bind="reviewTextAttrs"
-            :class="{ 'is-invalid': errors.reviewText }"></textarea>
-          <div class="invalid-feedback">{{ errors.reviewText }}</div>
-        </div>
-        <div class="form-group">
-          <label for="reviewRating" class="form-label">Rating</label>
-          <input name="reviewRating" id="reviewRating" type="number" v-model="reviewRating" v-bind="reviewRatingAttrs"
-            min="0" max="10" :class="{ 'is-invalid': errors.reviewRating }" />
-          <div class="invalid-feedback">{{ errors.reviewRating }}</div>
-
-        </div>
-        <button>Submit</button>
       </div>
+    </div>
+    <div class="row form-group mb-3">
+        <div class="col-3">
+            <img class="revew-header-preview" :src="headerImgPreview"/>
+        </div>
+        <div class="col-9">
+          <label for="reviewHeaderImg" class="form-label">Review Header</label>
+          <input class="form-control form-control-lg w-100" id="reviewHeaderImg" name="reviewHeaderImg" type="file"
+            @change="onHeaderImageSelect">
+        </div>
+
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label for="reviewText" class="form-label">Review Text</label>
+        <textarea class="w-100" name="reviewText" id="reviewText" v-model="reviewText" v-bind="reviewTextAttrs"
+          :class="{ 'is-invalid': errors.reviewText }"></textarea>
+        <div class="invalid-feedback">{{ errors.reviewText }}</div>
+      </div>
+      <div class="form-group">
+        <label for="reviewRating" class="form-label">Rating</label>
+        <input name="reviewRating" id="reviewRating" type="number" v-model="reviewRating" v-bind="reviewRatingAttrs"
+          min="0" max="10" :class="{ 'is-invalid': errors.reviewRating }" />
+        <div class="invalid-feedback">{{ errors.reviewRating }}</div>
+      </div>
+      <button>Submit</button>
     </div>
   </form>
   <InsertTitleModal @insert-title-modal-callback="insertTitleModalCallback" ref="insertTitleModal" />
 </template>
-
 
 <style scoped>
 .review-poster-home {
@@ -229,6 +246,9 @@ const [titleName, titleNameAttrs] = defineField('titleName');
   margin-bottom: 10px;
 }
 
+.revew-header-preview{
+  max-width:100%;
+}
 .thumbnail {
   max-width: 200px;
 }
@@ -236,29 +256,30 @@ const [titleName, titleNameAttrs] = defineField('titleName');
 label {
   font-weight: bold;
 }
+
 .poster-image {
-    height: 400px !important;
+  height: 400px !important;
 }
 
 .auto-complete-list-item {
-    text-decoration: none;
-    border: 1px solid black;
-    padding: 2px;
-    background-color: white;
+  text-decoration: none;
+  border: 1px solid black;
+  padding: 2px;
+  background-color: white;
 }
 
 .auto-complete-list {
-    list-style: none;
-    margin-left: 0px;
-    padding-left: 0px;
+  list-style: none;
+  margin-left: 0px;
+  padding-left: 0px;
 }
 
 .auto-complete-input {
-    margin-bottom: 3px;
+  margin-bottom: 3px;
 }
 
 
 #reviewScoreInput {
-    width: 155px;
+  width: 155px;
 }
 </style>

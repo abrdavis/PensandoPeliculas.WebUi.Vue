@@ -221,9 +221,8 @@ const [titleName, titleNameAttrs] = defineField('titleName');
   <InsertTitleModal @insert-title-modal-callback="insertTitleModalCallback" ref="insertTitleModal" />
 </template>
 
-<style scoped>
-@media (min-width: 1024px) {}
 
+<style scoped>
 .review-poster-home {
   width: 200px;
   margin-right: 2em;
@@ -236,5 +235,30 @@ const [titleName, titleNameAttrs] = defineField('titleName');
 
 label {
   font-weight: bold;
+}
+.poster-image {
+    height: 400px !important;
+}
+
+.auto-complete-list-item {
+    text-decoration: none;
+    border: 1px solid black;
+    padding: 2px;
+    background-color: white;
+}
+
+.auto-complete-list {
+    list-style: none;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+.auto-complete-input {
+    margin-bottom: 3px;
+}
+
+
+#reviewScoreInput {
+    width: 155px;
 }
 </style>

@@ -15,8 +15,10 @@ export const reviewService = {
         return res;
     });
 }
-function getReviews() {
-    return axiosWebApi.get(ApiPaths.GetReviews)
+function getReviews(resultCount = null, 
+    offset = null, 
+    orderBy = "") {
+    return axiosWebApi.get(`${ApiPaths.ReviewGet}?resultCount=${resultCount}&resultOffset=${offset}&orderBy=${orderBy}`)
         .then(res => {
             return res;
         });

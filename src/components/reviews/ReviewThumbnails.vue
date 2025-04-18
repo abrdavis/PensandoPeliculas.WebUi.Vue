@@ -25,8 +25,7 @@ export default {
 
             <a v-bind:href="`/review/${review.slug}`"
               class="justify-content-end flex-column text-decoration-none thumb-link overflow-hidden">
-              <img v-bind:src="review.posterThumbnailUrl
-                " class="review-poster-home  position-absolute w--100 h-100" />
+              <img v-bind:src="review.headerImageUrl" class="review-poster-home  position-absolute w--100 h-100" />
               <h3 class="d-inline thumb-overlay">
                 <span class="text-white">  {{ review.titleName }}</span>
               </h3>
@@ -66,7 +65,7 @@ export default {
 }
 .thumb-link {
   padding: 1.5rem !important;
-  aspect-ratio: 9/16;
+  aspect-ratio: 16/9;
   position: relative;
   display: flex;
   font-family: freight-big-pro,serif;

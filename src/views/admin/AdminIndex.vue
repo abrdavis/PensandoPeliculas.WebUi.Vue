@@ -17,7 +17,7 @@ import 'feather-icons/dist/feather.min.js'
         <div class="row">
             <div class="col-12">
                 <a href="admin/review/insert" @click="showAddTitleModal" class="d-block">Add Review</a>
-                <a href="admin/review/insert" @click="showAddTitleModal" class="d-block">Manage Reviews</a>
+                <a href="admin/review/manage" @click="showAddTitleModal" class="d-block">Manage Reviews</a>
                 <a href="admin/review/insert" @click="showAddTitleModal" class="d-block">Manage Titles</a>
                 <a href="admin/metadata" @click="showAddTitleModal" class="d-block">Manage Metadata</a>
             </div>

@@ -97,7 +97,7 @@ function insertTitleModalCallback(data) {
 
 }
 
-const headerImgPreview = ref(null)
+const headerImgPreview = ref(props.review?.headerImageUrl)
 const reviewHeaderImg = ref(null);
 const insertTitleModal = ref(null);
 const titleAutocompleteResults = ref([]);
@@ -215,7 +215,7 @@ const [titleName, titleNameAttrs] = defineField('titleName');
         </div>
         <div class="col-9">
           <label for="reviewHeaderImg" class="form-label">Review Header</label>
-          <input class="form-control form-control-lg w-100" id="reviewHeaderImg" name="reviewHeaderImg" type="file"
+          <input class="form-control form-control-lg w-100" id="reviewHeaderImg" name="reviewHeaderImg" type="file" 
             @change="onHeaderImageSelect">
         </div>
 

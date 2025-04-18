@@ -3,6 +3,7 @@ export class ApiPaths {
     static Logout = "user/Logout";
     static ReviewInsert = "Review/Insert";
     static ReviewUpdate = "Review/Update";
+    static ReviewGet = "Review/GetReviews";
     static GetHomePageReviews = "Review/GetForHomePage"
     static ReviewGetForSlug = "Review/GetForSlug"
     static MetaDataGetAdminViewModel = "MetaData/GetAdminViewModel"

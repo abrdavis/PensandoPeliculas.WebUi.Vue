@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import {getCookie} from './cookie-helper'
 import { useAuthStore } from '@/stores';
-import { HomeView, LoginView, InsertTitleView, InsertReviewView, ReviewView, AdminView, MetaDataView, UpdateReviewView } from '@/views';
+import { HomeView, LoginView, InsertTitleView, InsertReviewView, ReviewView, AdminView, MetaDataView, UpdateReviewView, ManageReviewView } from '@/views';
 
 
 
@@ -21,6 +21,10 @@ export const router = createRouter({
                 {
                     path: 'review/:slug',
                     component: UpdateReviewView
+                },
+                {
+                    path: 'review/manage',
+                    component: ManageReviewView
                 },
                 {
                     path: '', component: AdminView,

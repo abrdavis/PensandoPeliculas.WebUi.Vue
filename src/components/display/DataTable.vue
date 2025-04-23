@@ -5,7 +5,7 @@ defineOptions({
     name: 'DataTable',
 });
 
-
+import { router } from '@/helpers'
 const props = defineProps({
     data: {
         type: Array,
@@ -34,6 +34,9 @@ const props = defineProps({
     getUrl: {
         type: String,
     },
+    editRoute:{
+        type: String
+    },
     apiPagination: {
         type: Boolean,
         default: false
@@ -56,11 +59,11 @@ const showPrevPage = computed(() => {
     return currentIndex.value != 0 ? true : false;
 })
 
-const manageAttributes = computed(() => {
+function mapAttributes(index) {
     if (props.showManageColumn) {
         return {
-            readonly: this.isReadOnly,
-            disabled: this.isReadOnly ? 'readonly' : ''
+           'data-edit-key': props.editKey,
+           'data-index' : index
         }
     }
     else {
@@ -68,7 +71,7 @@ const manageAttributes = computed(() => {
     }
 
 
-})
+}
 function prevPageClick() {
     if (props.apiPagination) {
         console.log('TODO: fetch via API');
@@ -86,6 +89,15 @@ function nextPageClick() {
         currentIndex.value += props.resultsPerPage;
     }
 }
+
+function editClick(e){
+    const target = e.target;
+    const parentTd = target.closest('td');
+    const itemKey = parentTd.dataset.editKey;
+    const index = parseInt(parentTd.dataset.index);
+    const editKey = resultsToDisplay.value[index][itemKey];
+    router.push(`/${props.editRoute}/${editKey}`);
+}
 </script>
 
 <template>
@@ -101,11 +113,10 @@ function nextPageClick() {
             </thead>
             <tbody>
                 <tr v-for="(dataRow, index) in resultsToDisplay" :key="index">
-                    <td v-for="(column, index) in columns" :key="index"
-                    v-bind="manageAttributes">
+                    <td v-for="(column, index) in columns" :key="index">
                         {{ dataRow[column.field] }}
                     </td>
-                    <td v-if="showManageColumn">
+                    <td v-if="showManageColumn"  v-bind="mapAttributes(index)">
                         <vue-feather type="edit" title="Edit" @click="editClick"></vue-feather>
                         <vue-feather type="eye" title="View"></vue-feather>
                         <vue-feather type="delete" title="Delete"></vue-feather>

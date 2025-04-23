@@ -26,7 +26,7 @@ reviewService.getReviews().then(res => {
     <div>
         <h3>Peliculas Admin</h3>
 
-        <DataTable :data="reviews" :columns="columnData" :primaryKey="'reviewId'" id="manageReviewsGrid" :showManageColumn="true"/>
+        <DataTable :data="reviews" :columns="columnData" :primaryKey="'reviewId'" :editKey="'slug'" :editRoute="'Admin/review'" id="manageReviewsGrid" :showManageColumn="true"/>
 
     </div>
 </template>

@@ -5,12 +5,12 @@ import { reviewService } from '@/services/reviewService';
 import { ReviewConstants } from '@/utility/constants/reviewconstants';
 import 'feather-icons/dist/feather.min.js'
 const route = useRoute();
-const reviewSlug = route.params.slug;
+const reviewId = route.params.id;
 
 const reviewModel = ref(null);
 
 onMounted(async () => {
-    let res = await reviewService.getReviewForSlug(reviewSlug)
+    let res = await reviewService.getReviewForId(reviewId)
     if (res.data && res.data.success) {
         reviewModel.value = res.data.reviewModel;
     }

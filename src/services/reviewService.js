@@ -7,10 +7,19 @@ export const reviewService = {
     insertReview,
     updateReview,
     getHomePageReviews,
-    getReviewForSlug
+    getReviewForSlug,
+    getReviewForId
 };
  function getReviewForSlug(reviewSlug){
     return axiosWebApi.get(`${ApiPaths.ReviewGetForSlug}?reviewSlug=${reviewSlug}`)
+    .then(res => {
+        return res;
+    });
+}
+
+
+function getReviewForId(reviewId){
+    return axiosWebApi.get(`${ApiPaths.ReviewGetForSlug}?reviewId=${reviewId}`)
     .then(res => {
         return res;
     });
@@ -51,7 +60,7 @@ function getHomePageReviews(){
     let headers = {'content-type': 'multipart/form-data'};
     return axiosWebApi.post(ApiPaths.ReviewUpdate, requestData, {headers: headers, withCredentials: true} ).then(res => {return res;});
 }
-async function insertReview(reviewTitleId, 
+function insertReview(reviewTitleId, 
     reviewRating, 
     reviewPostTitle, 
     reviewText,

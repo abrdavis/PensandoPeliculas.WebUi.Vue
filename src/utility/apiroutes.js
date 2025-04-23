@@ -6,6 +6,7 @@ export class ApiPaths {
     static ReviewGet = "Review/GetReviews";
     static GetHomePageReviews = "Review/GetForHomePage"
     static ReviewGetForSlug = "Review/GetForSlug"
+    static ReviewGetForId = "Review/Get"
     static MetaDataGetAdminViewModel = "MetaData/GetAdminViewModel"
     static GenresGetAll = "MetaData/GenresGetAll"
     static GenreInsert = "MetaData/InsertGenre"

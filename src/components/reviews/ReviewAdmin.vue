@@ -20,7 +20,7 @@ const props = defineProps({
     type: Object,
   },
   mode: {
-    type: String,
+    type: String
   },
 });
 console.log(props.review)

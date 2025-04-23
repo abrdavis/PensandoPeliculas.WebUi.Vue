@@ -19,7 +19,7 @@ export const router = createRouter({
                     component: InsertReviewView
                 },
                 {
-                    path: 'review/:slug',
+                    path: 'review/:id',
                     component: UpdateReviewView
                 },
                 {

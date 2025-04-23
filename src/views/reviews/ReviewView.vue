@@ -23,10 +23,18 @@ reviewService.getReviewForSlug(reviewSlug).then(res => {
 
 <template>
     <div>
-            <h3>{{reviewModel?.reviewTitle}}</h3>
+            <h3 class="text-center">{{reviewModel?.reviewTitle}}</h3>
+            <img :src="reviewModel.headerImageUrl" class="header-image mx-auto  d-block"/>
             <p>
                     {{reviewModel?.reviewText}}
             </p>
     </div>
     
 </template>
+
+<style>
+.header-image{
+    width:600px;
+}
+
+</style>

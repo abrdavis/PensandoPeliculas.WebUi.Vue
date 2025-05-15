@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue';
-
+import { ref, computed, onMounted } from 'vue';
+import axiosWebApi from "../../services/axios/interceptors";
+import {ToastService} from "../../services/toastService"
 defineOptions({
     name: 'DataTable',
 });
@@ -40,24 +41,40 @@ const props = defineProps({
     apiPagination: {
         type: Boolean,
         default: false
+    },
+    orderBy:{
+        type: String,
+        default: ''
     }
 });
 const currentIndex = ref(0)
-
+const currentPage = ref(1)
+const dataRef = ref(props.data)
+let toastService = new ToastService()
 const endIndex = computed(() => {
-    return Math.min(currentIndex.value + props.resultsPerPage, props.data.length);
+    if(dataRef.value !== undefined)
+        return  Math.min(currentIndex.value + props.resultsPerPage, dataRef.value?.length);
+    else
+        return 0;
+    
 })
 const resultsToDisplay = computed(() => {
-    let result = props.data.slice(currentIndex.value, endIndex.value);
-    return result;
+    if(props.apiPagination)
+       return dataRef.value?.slice(currentIndex.value, endIndex.value);
+    else
+        return dataRef.value?.slice(currentIndex.value, endIndex.value);
+
 });
 
 const showNextPage = computed(() => {
-    return endIndex.value < props.data.length ? true : false;
+    if(dataRef.value !== undefined)
+        return endIndex.value < dataRef.value?.length || props.apiPagination ? true : false;
+    return false;
 })
 const showPrevPage = computed(() => {
-    return currentIndex.value != 0 ? true : false;
+    return currentPage.value > 1;
 })
+let orderBy = props.orderBy ?? '';
 
 function mapAttributes(index) {
     if (props.showManageColumn) {
@@ -74,19 +91,51 @@ function mapAttributes(index) {
 }
 function prevPageClick() {
     if (props.apiPagination) {
-        console.log('TODO: fetch via API');
+        const resultOffset = Math.min(((currentPage.value) * props.resultsPerPage)-props.resultsPerPage, 1)
+        axiosWebApi.get(`${props.getUrl}?resultCount=${props.resultsPerPage}&resultOffset=${resultOffset}&orderBy=${orderBy}`).then(res => {
+        if(res && res.data){
+            if(res.data.length <= 0){
+                toastService.success("No more results found.");
+            }
+            else{
+                dataRef.value = res.data;
+                currentPage.value +=1;
+            }
+            
+        }
+        else{
+            toastService.error("Error retrieving data");
+        }
+       })
     }
     else {
         currentIndex.value -= props.resultsPerPage;
     }
+    currentPage.value -=1;
 }
 
 function nextPageClick() {
     if (props.apiPagination) {
-        console.log('TODO: fetch via API');
+        const resultOffset = props.resultsPerPage * currentPage.value;
+       axiosWebApi.get(`${props.getUrl}?resultCount=${props.resultsPerPage}&resultOffset=${resultOffset}&orderBy=${orderBy}`).then(res => {
+        if(res && res.data){
+            if(res.data.length <= 0){
+                toastService.success("No more results found.");
+            }
+            else{
+                dataRef.value = res.data;
+                currentPage.value +=1;
+            }
+            
+        }
+        else{
+            toastService.error("Error retrieving data");
+        }
+       })
     }
     else {
         currentIndex.value += props.resultsPerPage;
+        currentPage.value +=1;
     }
 }
 
@@ -98,6 +147,16 @@ function editClick(e){
     const editKey = resultsToDisplay.value[index][itemKey];
     router.push(`/${props.editRoute}/${editKey}`);
 }
+
+onMounted(async () => {
+  if(props.apiPagination && props.getUrl){
+    let res = await axiosWebApi.get(`${props.getUrl}?resultCount=${props.resultsPerPage}&resultOffset=${endIndex.value}&orderBy=${orderBy}`)
+        .then(res => {
+            return res;
+        });
+    dataRef.value = res.data;
+  }
+})
 </script>
 
 <template>

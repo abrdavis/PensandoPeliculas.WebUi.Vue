@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axiosWebApi from "../../services/axios/interceptors";
-import {ToastService} from "../../services/toastService"
+import axiosWebApi from "@/services/axios/interceptors";
+import {ToastService} from "@/services/toastService"
 defineOptions({
     name: 'DataTable',
 });

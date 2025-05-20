@@ -1,23 +1,14 @@
 
 
 <script setup>
-import { reviewService } from '@/services/reviewService';
-import { ref } from 'vue';
+import { ApiPaths } from "@/utility/apiroutes";
 
 import 'feather-icons/dist/feather.min.js'
-const reviews = ref([])
+
 let columnData = [ {field: 'reviewTitle', headerText: 'Title'}, {field: 'titleName',  headerText: 'Movie'}, {field: 'reviewDate', headerText: 'Date'}];
-reviewService.getReviews().then(res => {
-    if(res.data && res.data.success){
-        reviews.value = res.data.reviews;
-    }
-})
 
 
-
-
-
-
+const getUrl = `${import.meta.env.VITE_API_URL}/${ApiPaths.ReviewGet}`
 
 
 </script>
@@ -26,7 +17,7 @@ reviewService.getReviews().then(res => {
     <div>
         <h3>Peliculas Admin</h3>
 
-        <DataTable :data="reviews" :columns="columnData" :primaryKey="'reviewId'" :editKey="'slug'" :editRoute="'Admin/review'" id="manageReviewsGrid" :showManageColumn="true"/>
+        <DataTable :columns="columnData" :primaryKey="'reviewId'" :editKey="'slug'" :editRoute="'Admin/review'" id="manageReviewsGrid" :showManageColumn="true" :apiPagination="true" :getUrl="getUrl" />
 
     </div>
 </template>

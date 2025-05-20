@@ -7,14 +7,14 @@ import * as Yup from 'yup';
 import { Spinner } from 'spin.js';
 import 'feather-icons/dist/feather.min.js'
 import { titleService } from '@/services/titleService';
-import { toast } from 'vue3-toastify';
+import {ToastService} from "@/services/toastService"
 import { reviewService } from '@/services/reviewService';
 
 defineOptions({
   name: 'ReviewAdmin',
 });
 
-
+const toastService = new ToastService()
 const props = defineProps({
   review: {
     type: Object,
@@ -136,18 +136,10 @@ const onSubmit = handleSubmit(values => {
   if (props.mode == ReviewConstants.Update) {
     reviewService.updateReview(props.review.reviewId, titleForReview.value, reviewRating, reviewTitle, reviewText, reviewHeaderImg.value).then(res => {
       if (res.data && res.data.success) {
-        toast("Review updated.", {
-          "theme": "dark",
-          "type": "success",
-          "dangerouslyHTMLString": true
-        });
+        toastService.success("Review updated.");
       }
       else {
-        toast("Error updating review.", {
-          "theme": "dark",
-          "type": "success",
-          "dangerouslyHTMLString": true
-        });
+        toastService.error("Error updating review.");
       }
     });
   }
@@ -157,11 +149,7 @@ const onSubmit = handleSubmit(values => {
         router.push({ path: `/review/${res.data.reviewId}` });
       }
       else {
-        toast("Error inserting review.", {
-          "theme": "dark",
-          "type": "success",
-          "dangerouslyHTMLString": true
-        });
+        toastService.error("Error inserting review.");
       }
     });
   }

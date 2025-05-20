@@ -1,15 +1,15 @@
 <script setup>
 
-    import { metaDataService } from '@/services/metaDataService'
-    import { ref } from 'vue'
-    import { toast } from 'vue3-toastify';
+import { metaDataService } from '@/services/metaDataService'
+import { ref } from 'vue'
+import {ToastService} from "@/services/toastService"
 
 import feather from 'feather-icons/dist/feather.min.js'
-import {sortObjectAlphabeticalByKey} from '../../helpers/array-helper'
+import {sortObjectAlphabeticalByKey} from '@/helpers/array-helper'
   const genres = ref([])
 const newGenreName = ref('')
 
-
+const toastService = new ToastService();
     metaDataService.getMetaDataViewModel().then(res =>{
         const data = res.data;
             if(data.success){
@@ -25,27 +25,15 @@ const newGenreName = ref('')
                     newGenreName.value = '';
                     genres.value.push(res.data.genre);
                     genres.value = sortObjectAlphabeticalByKey(genres.value, 'genreName')
-                    toast("Genre added.", {
-                        "theme": "dark",
-                        "type": "success",
-                        "dangerouslyHTMLString": true
-                        });
+                    toastService.success("Genre added.");
                 }
                 else{
-                    toast("Error adding genre.", {
-                        "theme": "dark",
-                        "type": "error",
-                        "dangerouslyHTMLString": true
-                        });
+                    toastService.error("Error adding genre.");
                 }
             })
         }
         else{
-            toast("Please specify a genre name.", {
-                        "theme": "dark",
-                        "type": "error",
-                        "dangerouslyHTMLString": true
-                        });
+            toastService.error("Please specify a genre name.");
         }
     }
 

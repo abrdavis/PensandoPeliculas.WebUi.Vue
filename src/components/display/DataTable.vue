@@ -21,6 +21,9 @@ const props = defineProps({
     editKey: {
         type: String,
     },
+    viewKey: {
+        type: String,
+    },
     deleteKey: {
         type: String,
     },
@@ -36,6 +39,9 @@ const props = defineProps({
         type: String,
     },
     editRoute: {
+        type: String
+    },
+    viewRoute:{
         type: String
     },
     apiPagination: {
@@ -80,6 +86,7 @@ function mapAttributes(index) {
     if (props.showManageColumn) {
         return {
             'data-edit-key': props.editKey,
+            'data-view-key': props.viewKey,
             'data-index': index
         }
     }
@@ -99,7 +106,7 @@ function prevPageClick() {
                 }
                 else {
                     dataRef.value = res.data;
-                    currentPage.value += 1;
+                    currentPage.value -= 1;
                 }
 
             }
@@ -110,8 +117,9 @@ function prevPageClick() {
     }
     else {
         currentIndex.value -= props.resultsPerPage;
+        currentPage.value -= 1;
     }
-    currentPage.value -= 1;
+    
 }
 
 function nextPageClick() {
@@ -137,6 +145,15 @@ function nextPageClick() {
         currentIndex.value += props.resultsPerPage;
         currentPage.value += 1;
     }
+}
+
+function viewClick(e){
+    const target = e.target;
+    const parentTd = target.closest('td');
+    const itemKey = parentTd.dataset.viewKey;
+    const index = parseInt(parentTd.dataset.index);
+    const viewKey = resultsToDisplay.value[index][itemKey];
+    router.push(`/${props.viewRoute}/${viewKey}`);
 }
 
 function editClick(e) {
@@ -177,9 +194,9 @@ onMounted(async () => {
                         {{ dataRow[column.field] }}
                     </td>
                     <td v-if="showManageColumn" v-bind="mapAttributes(index)">
-                        <vue-feather type="edit" title="Edit" @click="editClick"></vue-feather>
-                        <vue-feather type="eye" title="View"></vue-feather>
-                        <vue-feather type="delete" title="Delete"></vue-feather>
+                        <vue-feather role="button" type="edit" title="Edit" @click="editClick"></vue-feather>
+                        <vue-feather role="button" type="eye" title="View"  @click="viewClick"></vue-feather>
+                        <vue-feather role="button" type="delete" title="Delete"></vue-feather>
                     </td>
                 </tr>
             </tbody>

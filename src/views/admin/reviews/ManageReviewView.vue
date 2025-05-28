@@ -17,7 +17,16 @@ const getUrl = `${import.meta.env.VITE_API_URL}/${ApiPaths.ReviewGet}`
     <div>
         <h3>Peliculas Admin</h3>
 
-        <DataTable :columns="columnData" :primaryKey="'reviewId'" :editKey="'reviewId'" :editRoute="'Admin/review'" id="manageReviewsGrid" :showManageColumn="true" :apiPagination="true" :getUrl="getUrl" />
+        <DataTable :columns="columnData" 
+        :primaryKey="'reviewId'" 
+        :editKey="'reviewId'" 
+        :editRoute="'Admin/review'"
+        :viewRoute="'Review'"
+        :viewKey="'slug'"
+         id="manageReviewsGrid" 
+         :showManageColumn="true" 
+         :apiPagination="true" 
+         :getUrl="getUrl" />
 
     </div>
 </template>

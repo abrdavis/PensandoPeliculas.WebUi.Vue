@@ -24,6 +24,6 @@ onMounted(async () => {
 <template>
     <div>
         <h3>Update Review</h3>
-        <ReviewAdmin :review="reviewModel"  :mode="ReviewConstants.Update"/>
+        <ReviewAdmin v-if="reviewModel" :review="reviewModel"  :mode="ReviewConstants.Update"/>
     </div>
 </template>

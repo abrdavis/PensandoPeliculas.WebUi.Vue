@@ -3,10 +3,10 @@
 import { metaDataService } from '@/services/metaDataService'
 import { ref } from 'vue'
 import {ToastService} from "@/services/toastService"
-
 import feather from 'feather-icons/dist/feather.min.js'
 import {sortObjectAlphabeticalByKey} from '@/helpers/array-helper'
-  const genres = ref([])
+
+const genres = ref([])
 const newGenreName = ref('')
 
 const toastService = new ToastService();

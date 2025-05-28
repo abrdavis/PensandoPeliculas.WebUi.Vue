@@ -19,7 +19,7 @@ export const reviewService = {
 
 
 function getReviewForId(reviewId){
-    return axiosWebApi.get(`${ApiPaths.ReviewGetForSlug}?reviewId=${reviewId}`)
+    return axiosWebApi.get(`${ApiPaths.ReviewGetForId}?reviewId=${reviewId}`)
     .then(res => {
         return res;
     });
